@@ -1,5 +1,3 @@
-import queue
-
 words = ["frodo", "front", "frost", "frozen", "frame", "kakao"]
 queries = ["fro??", "????o", "fr???", "fro???", "pro?"]
 
@@ -7,68 +5,61 @@ def reverse_string(string):
     return string[::-1]
 
 class Node(object):
-    def __init__(self, key, end=0, idx=0):
+    def __init__(self, key, cnt=0):
         self.key = key
-        self.end = end
-        self.idx = idx
+        self.cnt = cnt
         self.child = {}
 
 class Trie(object):
     def __init__(self):
-        self.head = Node(None) #초기화
+        self.head = Node(None)
 
-    def insert(self, word, idx):
+    def insert(self, word):
         cur = self.head
 
-        end_check = len(word)
-
-        for n, char in enumerate(word):
+        for char in word:
             if char not in cur.child:
-                if (n + 1) == end_check:
-                    cur.child[char] = Node(char, end_check, idx)
-                else:
-                    cur.child[char] = Node(char)
+                cur.child[char] = Node(char)
 
+            cur.cnt += 1
             cur = cur.child[char]
 
-    def search(self, word):
+        cur.cnt += 1
+
+    def search(self, query):
         cur = self.head
 
-        word_size = len(word)
+        answer = 0
 
-        que = queue.Queue()
-        que.put(cur)
+        for char in query:
+            if char in cur.child:
+                cur = cur.child[char]
+            elif char is not "?":
+                return 0
 
-        while que.empty() is False:
-            q = que.get()
+            if char is '?':
+                answer = cur.cnt
+                return answer
 
-            if char in q.child:
-                q.put(q.child[char])
-            if '?' in q.child:
-                q.put(q.child['?'])
-
-            if char not in q.child and '?' not in q.child:
-                return False
-
-            if q.end == word_size:
+        return answer
 
 def solution(words, queries):
     answer = [0 for _ in range(len(queries))]
 
-    trie = Trie()
+    trie = [Trie() for _ in range(10001)]
+    reverse_trie = [Trie() for _ in range(10001)]
+
+    for word in words:
+        trie[len(word)].insert(word)
+        reverse_trie[len(word)].insert(reverse_string(word))
 
     for idx, query in enumerate(queries):
         if query.startswith('?'):
             query = reverse_string(query)
-
-        trie.insert(query, idx)
-
-    for n, word in enumerate(words):
-        trie.search(word)
-        trie.search(reverse_string(word))
-
+            answer[idx] = reverse_trie[len(query)].search(query)
+        else:
+            answer[idx] = trie[len(query)].search(query)
 
     return answer
-
 
 print(solution(words, queries))
