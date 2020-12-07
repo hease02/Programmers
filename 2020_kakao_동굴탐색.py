@@ -1,3 +1,6 @@
+import sys
+sys.setrecursionlimit(10**9)
+
 n_list = [9, 9, 9]
 path_list = [[[0, 1], [0, 3], [0, 7], [8, 1], [3, 6], [1, 2], [4, 7], [7, 5]],
              [[8, 1], [0, 1], [1, 2], [0, 7], [4, 7], [0, 3], [7, 5], [3, 6]],
@@ -9,24 +12,21 @@ result_list = [True, True, False]
 
 def dfs(start):
     #order를 확인하여 visit / next_visit 표시
-    if start in order_dict.keys():
-        if order_check[order_dict[start]]:
-            visit[start] = 1
-        else:
-            next_visit[start] = 1
-            return
-    else:
-        if start in order_check.keys():
-            order_check[start] = True
+    if visit[start]: #방문했을 경우 바로 리턴
+        return
 
-        visit[start] = 1
+    if start in order_dict.keys():
+        if visit[order_dict[start]] is not 1:
+            next_visit[order_dict[start]] = start
+            return
+
+    visit[start] = 1
+
+    if next_visit[start] is not -1:
+        dfs(next_visit[start])
 
     for child in adj_list[start]:
-        if visit[child] is not 1:
-            dfs(child)
-        else:
-            if next_visit[child] is 1:
-                dfs(child)
+        dfs(child)
 
     return
 
@@ -41,7 +41,7 @@ def solution(n, path, order):
     order_check = {}
 
     visit = [0 for _ in range(n)] # 방문 확인용
-    next_visit = [0 for _ in range(n)]
+    next_visit = [-1 for _ in range(n)]
 
     #인접리스트 만들기
     for path_tmp in path:
@@ -51,11 +51,14 @@ def solution(n, path, order):
     #order확인용 dict 만들기
     for order_tmp in order:
         order_dict[order_tmp[1]] = order_tmp[0] #order_dict[end] = start
-        order_check[order_tmp[0]] = False
 
-    for i in range(n):
-        if visit[i] is not 1:
-            dfs(i)
+    if 0 in order_dict.keys():
+        return False
+
+    visit[0] = 1
+
+    for i in adj_list[0]:
+        dfs(i)
 
     for ans in visit:
         if ans == 0:
