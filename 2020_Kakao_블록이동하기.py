@@ -1,8 +1,6 @@
 from collections import deque
 import sys
 
-board = [[0, 0, 0, 1, 1],[0, 0, 0, 1, 0],[0, 1, 0, 1, 1],[1, 1, 0, 0, 1],[0, 0, 0, 0, 0]]
-
 class Robot:
     def __init__(self, blk1_x, blk1_y, blk2_x, blk2_y, horizon, move):
         self.blk1_x = blk1_x
@@ -26,8 +24,8 @@ def solution(board):
                       [[-1, 0, -1, 0], [-1, 1, 0, 0]]]
     vertical_rotate = [[[0, 1, 0, 1], [0, 0, -1, 1]],
                        [[0, 1, 0, 1], [1, 0, 0, 1]],
-                       [[-1, 0, -1, 0], [1, -1, 0, 0]],
-                       [[-1, 0, -1, 0], [0, -1, -1, 0]]]
+                       [[0, -1, 0, -1], [1, -1, 0, 0]],
+                       [[0,-1, 0, -1], [0, -1, -1, 0]]]
 
 
     que.append(Robot(0, 0, 0, 1, True, 0))
@@ -113,5 +111,3 @@ def solution(board):
                             que.append(add_robot)
 
     return answer
-
-print(solution(board))

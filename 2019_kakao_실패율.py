@@ -34,6 +34,7 @@ def solution(N, stages):
 
     for ans in answer:
         result.append(ans[0] + 1)
+
     return result
 
 for n, stage in zip(N_list, stages_list):
